@@ -1,5 +1,3 @@
-
-````markdown
 # 🔐 Brute Force Login Detection – Windows + Splunk SIEM
 
 This project simulates and detects a brute-force login attack on a Windows 10 virtual machine using native PowerShell, Windows Security Logs, Splunk Universal Forwarder, and Splunk Enterprise SIEM.
@@ -30,7 +28,7 @@ for ($i = 1; $i -le 15; $i++) {
     cmd /c "net use \\127.0.0.1\IPC$ /user:$user $wrongpass"
     Start-Sleep -Milliseconds 500
 }
-````
+
 
 ---
 
