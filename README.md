@@ -1,4 +1,3 @@
-Absolutely — here is the **copy-paste-ready version of your `README.md`**, clean and simple. Just copy everything below into a file named `README.md` and place it in your repo root.
 
 ---
 
@@ -117,18 +116,7 @@ project_brute_force_detection/
 **Sumit Kumar**
 Cybersecurity learner & SOC analyst-in-training
 📍 Canada
-📧 \[[YourEmail@example.com](mailto:YourEmail@example.com)]
-🌐 GitHub: \[github.com/your-username]
+📧 \[[i.sumitkumar@outlook.com](mailto:i.sumitkumar@outlook.com)]
+🌐 GitHub: \[github.com/sumit-kumar]
 
 ---
-
-```
-
----
-
-Just replace:
-- `[YourEmail@example.com]` with your real (optional) email  
-- `[github.com/your-username]` with your GitHub profile URL
-
-Let me know when you're ready to move to **Kali (Hydra external brute-force)**.
-```
