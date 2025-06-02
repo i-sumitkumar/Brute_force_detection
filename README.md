@@ -1,24 +1,25 @@
-# 🔐 Brute Force Login Detection – Windows + Splunk SIEM
+# 🛡️ Enterprise Brute-Force Detection (Windows + Splunk SIEM)
 
-This project simulates and detects a brute-force login attack on a Windows 10 virtual machine using native PowerShell, Windows Security Logs, Splunk Universal Forwarder, and Splunk Enterprise SIEM.
-
----
-
-## 📂 Project Overview
-
-| Category     | Detail                                       |
-|--------------|----------------------------------------------|
-| 🖥️ Target VM | Windows 10 Pro (VirtualBox)                  |
-| 🔧 Tools     | PowerShell, Event Viewer, Splunk, AuditPol   |
-| 📡 Detection | SPL Query + SIEM Alerts via Splunk Enterprise |
-| 📁 Report    | IR_BruteForce_2025_SumitKumar.pdf             |
-| 🧠 Focus     | Threat detection, log correlation, alerting  |
+This project simulates and detects brute-force login attacks on a Windows 10 environment using native audit policies, PowerShell simulation, Splunk Universal Forwarder, and Splunk Enterprise. It replicates real-world SOC workflows and log-based detection strategies.
 
 ---
 
-## 🎯 Attack Simulation
+## 📌 Project Summary
 
-A PowerShell script was used to simulate 15 failed login attempts for user `testuser` within 1 minute.
+| Category             | Details                                      |
+|----------------------|----------------------------------------------|
+| 🌟 Use Case           | Brute-force login detection (Internal + External) |
+| 💻 Target Environment | Windows 10 Pro (VM)                         |
+| 🛠️ Tools Used         | PowerShell, Splunk Universal Forwarder, Splunk SIEM |
+| 🔍 Detection Method   | Log correlation using SPL (Event ID 4625)    |
+| 📡 Log Source         | WinEventLog:Security                         |
+| 📄 Report Output      | [Incident Report PDF](./report/Brute_Force_Detection_Incident_Report.pdf) |
+
+---
+
+## 🎯 Attack Simulation Phases
+
+### 1. **Internal Attack (PowerShell Simulation)**
 
 ```powershell
 $user = "testuser"
@@ -28,11 +29,27 @@ for ($i = 1; $i -le 15; $i++) {
     cmd /c "net use \\127.0.0.1\IPC$ /user:$user $wrongpass"
     Start-Sleep -Milliseconds 500
 }
+```
 
+- ✅ Generates 15 failed login attempts locally
+- ✅ Triggers Event ID 4625 + 4740 (lockout)
+- 📸 Screenshot: `script_runned.png`, `security_breach.png`
 
 ---
 
-## 🔍 Detection Logic (SPL)
+### 2. **External Attack (Kali → Windows 10 via RDP)**
+
+```bash
+hydra -t 4 -V -f -l testuser -P /usr/share/wordlists/rockyou.txt rdp://<target_ip>
+```
+
+- ✅ Simulates real-world credential brute-force
+- ✅ Logs source IP from Kali in Event ID 4625
+- 📸 Screenshot: `Externalattackstats.png`
+
+---
+
+## 🔍 SPL Detection Logic (Brute-Force Pattern)
 
 ```spl
 index=* sourcetype="WinEventLog:Security" EventCode=4625
@@ -41,78 +58,93 @@ index=* sourcetype="WinEventLog:Security" EventCode=4625
 | where count >= 5
 ```
 
-✅ This triggers an alert if any user has 5 or more failed logins within a 1-minute window.
+- ✅ Detects any user with ≥5 failed logins in 1 minute
+- 📸 Screenshot: `brute force filter visualization.png`, `Splunk logs recieved.png`
 
 ---
 
-## 📊 Screenshots
+## 📄 Key Event IDs Captured
 
-| Visual Evidence                      | File                               |
-| ------------------------------------ | ---------------------------------- |
-| PowerShell Script Execution          | `scripts/attack_script_ran.png`    |
-| Windows Event Viewer - Event 4625    | `screenshots/eventviewer_4625.png` |
-| Splunk Search - Raw Table            | `screenshots/splunk_raw_table.png` |
-| Splunk Bar Chart - Detection Summary | `screenshots/splunk_bar_chart.png` |
-| Audit Policy Enabled (AuditPol)      | `screenshots/auditpol_enabled.png` |
+| Event ID | Description             |
+|----------|--------------------------|
+| 4625     | Failed logon attempt     |
+| 4740     | Account lockout (optional) |
+| 4672     | Special logon privileges |
+| 4776     | Credential validation    |
 
----
-
-## 📄 Incident Response Report
-
-🧾 [Download Full PDF Report](./report/IR_BruteForce_2025_SumitKumar.pdf)
-
-Includes:
-
-* Attack summary
-* Evidence screenshots
-* MITRE mapping (T1110.001)
-* Detection explanation
-* Remediation steps
-* Analyst recommendations
+📸 Screenshots:
+- `Audit.png`
+- `Audit event capture detail applied.png`
+- `index.png`
+- `splunk info representation.png`
 
 ---
 
-## 🔐 MITRE ATT\&CK Mapping
+## 📊 SIEM Dashboard Results
 
-| Technique | Description                     |
-| --------- | ------------------------------- |
-| T1110.001 | Brute Force - Password Guessing |
+- ✅ Search queries successfully triggered in Splunk
+- ✅ External IP captured from Kali Linux
+- ✅ RDP-based failures also visible in timeline
+
+📸 Sample:
+![Brute-force Bar Chart](./screenshots/brute%20force%20filter%20visualization.png)
+
+---
+
+## 🧠 MITRE ATT&CK Mapping
+
+| Tactic             | Technique                        | ID        |
+|--------------------|----------------------------------|-----------|
+| Credential Access  | Password Guessing (Brute-Force) | T1110.001 |
+
+---
+
+## 🔐 Recommendations
+
+- Enforce account lockout policies (Event 4740)
+- Monitor high-frequency Event ID 4625 per user/IP
+- Correlate with Event 4776 and Logon_Type for deeper insight
+- Use RDP lockout or MFA in production environments
+- Simulate alerting via scheduled SPL jobs in Splunk
 
 ---
 
 ## 📁 Folder Structure
 
 ```
-project_brute_force_detection/
-├── detection/                   # SPL detection query
-│   └── brute_force_detection.spl
-├── scripts/                     # Attack simulation code
-│   └── powershell_brute_force.ps1
-├── screenshots/                 # Log and query screenshots
-├── report/                      # Final IR report
-│   └── IR_BruteForce_2025_SumitKumar.pdf
-└── README.md                    # This file
+enterprise-brute-force-detection-windows-siem/
+├── scripts/
+│   └── powershell_bruteforce_simulation.ps1
+├── detection/
+│   └── brute_force_spl_query.spl
+├── screenshots/
+│   ├── script_runned.png
+│   ├── security_breach.png
+│   ├── Splunk logs recieved.png
+│   ├── brute force filter visualization.png
+│   └── Externalattackstats.png
+├── report/
+│   └── Brute_Force_Detection_Incident_Report.pdf
+├── README.md
 ```
+
+---
+
+## 👨‍💼 Author
+
+**Sumit Kumar**  
+SOC Analyst (Junior, Self-Trained)  
+🇨🇦 Based in Canada  
+📧 [i.sumitkumar@outlook.com](mailto:i.sumitkumar@outlook.com)  
+🌐 [GitHub Profile](https://github.com/sumit-kumar)
 
 ---
 
 ## ✅ Status
 
-* [x] Attack simulated (PowerShell brute-force)
-* [x] Logs forwarded via Universal Forwarder
-* [x] Detection written in SPL
-* [x] Alert logic tested
-* [x] IR report generated and attached
-* [ ] \[Upcoming] External attack using Kali + Hydra
-
----
-
-## 💼 About the Author
-
-**Sumit Kumar**
-Cybersecurity learner & SOC analyst-in-training
-📍 Canada
-📧 \[[i.sumitkumar@outlook.com](mailto:i.sumitkumar@outlook.com)]
-🌐 GitHub: \[github.com/sumit-kumar]
-
----
+- [x] Windows auditing enabled
+- [x] Splunk logs ingested via Universal Forwarder
+- [x] PowerShell brute-force simulated
+- [x] External RDP brute-force simulated
+- [x] Event correlation + detection alert working
+- [x] Incident report finalized and attached
