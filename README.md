@@ -86,8 +86,6 @@ index=* sourcetype="WinEventLog:Security" EventCode=4625
 - ✅ External IP captured from Kali Linux
 - ✅ RDP-based failures also visible in timeline
 
-📸 Sample:
-![Brute-force Bar Chart](./screenshots/brute%20force%20filter%20visualization.png)
 
 ---
 
@@ -136,7 +134,7 @@ enterprise-brute-force-detection-windows-siem/
 SOC Analyst (Junior, Self-Trained)  
 🇨🇦 Based in Canada  
 📧 [i.sumitkumar@outlook.com](mailto:i.sumitkumar@outlook.com)  
-🌐 [GitHub Profile](https://github.com/sumit-kumar)
+🌐 [GitHub Profile](https://github.com/i-sumitkumar)
 
 ---
 
